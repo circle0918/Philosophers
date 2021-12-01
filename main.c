@@ -6,7 +6,7 @@
 /*   By: yyuan <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/29 12:08:24 by yyuan             #+#    #+#             */
-/*   Updated: 2021/11/30 00:46:47 by yyuan            ###   ########.fr       */
+/*   Updated: 2021/11/30 22:15:57 by yyuan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <pthread.h>
@@ -83,13 +83,18 @@ int parser(int ac, char **av, t_arg *arg)
 			arg->must_eat = ft_atoi(av[5]);
 		else
 			arg->must_eat = -1;
+		if(arg->total < 0|| arg->die < 0 || arg->eat < 0 || arg->sleep < 0 )
+		{
+			printf("%s\n", "Error argument : wrong input");
+			return (1);
+		}
 	
 //		printf("%d\n", philo->arg.total);
 //		printf("%d\n", philo->arg.must_eat);
 	}
 	else
 	{	
-		printf("%s\n", "Error : argument");
+		printf("%s\n", "Error argument : wrong input");
 		return (1);
 	}
 	return (0);
@@ -101,7 +106,7 @@ void fun1(t_philo *philo)
 	int i = 0;
 	while(i < 1)
 	{
-		printf("%d\n", philo->thread);
+		printf("id : %d lfork : %p rfork:  %p\n", philo->thread, philo->lfork, philo->rfork);
 	//	sleep(1);
 		i++;
 	}
