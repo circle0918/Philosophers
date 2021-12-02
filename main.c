@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 #include <pthread.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 typedef struct s_arg
 {
@@ -23,6 +24,7 @@ typedef struct s_arg
 
 typedef struct s_philo
 {
+	int				index;
 	pthread_t		thread;
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*rfork;
@@ -100,17 +102,50 @@ int parser(int ac, char **av, t_arg *arg)
 	return (0);
 }
 //pthread_mutex_t	fork;
-void fun1(t_philo *philo)
+
+//mille second 
+uint64_t get_time()
 {
-//	int res = pthread_mutex_lock(&fork);
-	int i = 0;
-	while(i < 1)
+	struct timeval t;
+ 	
+	gettimeofday(&t, NULL);
+    return (uint64_t)(t.tv_sec * 1000 + t.tv_usec / 1000);
+}
+
+void counter()
+{
+
+}
+
+
+void activites(t_philo *philo)
+{
+	/*philo->time_begin_count = get_time();
+	//philo->die_duration = philo->time_begin_count + philo->arg.die;
+	pthread count_dead;
+	pthread_create(&count_dead, NULL, &counter, philo);
+	pthread_detach(count_dead);*/
+
+	if(philo->index % 2 == 0)
+		usleep(500);
+	while(1)
 	{
-		printf("id : %d lfork : %p rfork:  %p\n", philo->thread, philo->lfork, philo->rfork);
-	//	sleep(1);
-		i++;
+		pthread_mutex_lock(philo->lfork);
+		printf("philo %d has taken a lfork\n", philo->index);
+		pthread_mutex_lock(philo->rfork);
+		printf("philo %d has taken a rfork\n", philo->index);
+	//	philo->time_begin_count = get_time();
+		printf("philo %d is eating\n", philo->index);
+		usleep(philo->arg.eat * 1000);
+		pthread_mutex_unlock(philo->lfork); 
+		pthread_mutex_unlock(philo->rfork);
+		//printf("eat time %d\n", philo->arg.eat);
+	//	philo->time_last = get_time();
+		printf("philo %d is sleeping\n", philo->index);
+		usleep(philo->arg.sleep * 1000);
+//		return 1; 
+	//	i++;
 	}
-  //  pthread_mutex_unlock(&fork); 
 }
 void init(t_philo **philo, t_arg arg, pthread_mutex_t **fork)
 {
@@ -137,7 +172,8 @@ void init(t_philo **philo, t_arg arg, pthread_mutex_t **fork)
 			philo[i]->rfork = fork[0];
 		else
 			philo[i]->rfork = fork[i+1];
-	    pthread_create(&(philo[i]->thread), NULL, (void *)&fun1, philo[i]);
+		philo[i]->index = i + 1;
+	    pthread_create(&(philo[i]->thread), NULL, (void *)&activites, philo[i]);
 		i++;
 	}
 
