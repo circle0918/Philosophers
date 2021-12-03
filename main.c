@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/time.h>
 typedef struct s_arg
 {
 	int total;
@@ -25,6 +26,9 @@ typedef struct s_arg
 typedef struct s_philo
 {
 	int				index;
+	int				is_eating;
+	int				is_dead;
+	long int		time_begin_count;
 	pthread_t		thread;
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*rfork;
@@ -104,27 +108,37 @@ int parser(int ac, char **av, t_arg *arg)
 //pthread_mutex_t	fork;
 
 //mille second 
-uint64_t get_time()
+long int get_time()
 {
 	struct timeval t;
  	
 	gettimeofday(&t, NULL);
-    return (uint64_t)(t.tv_sec * 1000 + t.tv_usec / 1000);
+    return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
 
-void counter()
+void counter(t_philo *philo)
 {
-
+	while (1)
+	{
+		
+		if (!philo->is_eating && get_time() - philo->time_begin_count > philo->arg.die)
+		{
+			printf("philo %d is dead\n", philo->index);
+			philo->is_dead = 1;
+			return ;
+		}
+		usleep(9000);
+	}
 }
 
 
 void activites(t_philo *philo)
 {
-	/*philo->time_begin_count = get_time();
+	philo->time_begin_count = get_time();
 	//philo->die_duration = philo->time_begin_count + philo->arg.die;
-	pthread count_dead;
+	pthread_t count_dead;
 	pthread_create(&count_dead, NULL, &counter, philo);
-	pthread_detach(count_dead);*/
+	pthread_detach(count_dead);
 
 	if(philo->index % 2 == 0)
 		usleep(500);
@@ -136,7 +150,9 @@ void activites(t_philo *philo)
 		printf("philo %d has taken a rfork\n", philo->index);
 	//	philo->time_begin_count = get_time();
 		printf("philo %d is eating\n", philo->index);
+		philo->is_eating = 1;
 		usleep(philo->arg.eat * 1000);
+		philo->is_eating = 0;
 		pthread_mutex_unlock(philo->lfork); 
 		pthread_mutex_unlock(philo->rfork);
 		//printf("eat time %d\n", philo->arg.eat);
@@ -197,15 +213,30 @@ int main(int ac, char **av)
 //	philo1.arg = arg; //while (init all);
 //	printf("%d\n", philo1.arg.eat);
 	int i = 0;
-	while(i < arg.total)	
+	while (i < arg.total)	
 	{	
 		pthread_join(philo[i]->thread, NULL);
 		i++;
 	}
-	//	pthread_join(philo2.thread,NULL);*/
-		
+	//	pthread_join(philo2.thread,NULL);
+	
+	int finish = 0;
+	while (!finish)
+	{
+		int i = 0;
+		while (i < arg.total)
+		{
+			if (philo[i]->is_dead == 1)
+			{
+				finish = 1;
+				break;
+			}
+			i++;
+		}	
+	}
+	
 	i = 0;
-	while(i < arg.total)	
+	while (i < arg.total)	
 	{
 		free(fork[i]);
 		free(philo[i]);
