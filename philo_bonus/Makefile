@@ -13,14 +13,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -pthread
 RM = rm -f
-NAME= philo
-SOURCES = ./main.c \
-		./parser.c ./utils.c ./print.c
+NAME= philo_bonus
+SOURCES = main_bonus.c \
+		parser.c init.c utils.c
 
 all: $(NAME)
 
 $(NAME): fclean
 	gcc $(CFLAGS) -o $(NAME) $(SOURCES)
+
+bonus: $(NAME)
 
 clean:
 	$(RM) *.o
