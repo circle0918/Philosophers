@@ -14,7 +14,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <string.h>
 typedef struct s_arg
 {
 	int total;
@@ -26,18 +25,17 @@ typedef struct s_arg
 
 typedef struct s_share
 {
-	int				share_dead;
 	t_arg			arg;
 	unsigned long		start_time;
 	pthread_mutex_t	printf_mutex;
 	pthread_mutex_t	somebody_dead_mutex;
 	pthread_t		share_thread;
+	int				share_dead;
 }	t_share;
 
 typedef struct s_philo
 {
 	int				index;
-	int				is_eating;
 	int				finish_must_eat;
 	int				eat_count;
 	unsigned long	time_begin_count;
@@ -45,10 +43,7 @@ typedef struct s_philo
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*rfork;
 	t_share			*share;
-	pthread_mutex_t	mutex;
 }	t_philo;
-
-
 
 int	ft_atoi(const char *str)
 {
@@ -72,6 +67,7 @@ int	ft_atoi(const char *str)
 	}
 	return ((int)ret);
 }
+
 int isnum(int ac, char **av)
 {
 	int i;
@@ -91,8 +87,6 @@ int isnum(int ac, char **av)
 	}
 	return (1);
 }
-
-
 
 int parser(int ac, char **av, t_arg *arg)
 {
@@ -128,6 +122,9 @@ unsigned long get_time()
 	gettimeofday(&t, NULL);
     return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
+
+//input change to millisecond (usleep's input is mircosecond)
+//but more precise than usleep
 void	ft_usleep(unsigned long millisecond)
 {
 	unsigned long	end_time;
@@ -136,40 +133,13 @@ void	ft_usleep(unsigned long millisecond)
 	while (get_time() < end_time)
 		usleep(millisecond);
 }
+
 void	printf_mutex(t_philo *philo, char* msg)
 {
-	//if(philo->share->share_dead == 1)
-	//	return ;
 	pthread_mutex_lock(&philo->share->printf_mutex);
 	if(philo->share->share_dead == 0)
 		printf("%ld\tphilo %d %s\n", get_time() - philo->share->start_time, philo->index, msg);
 	pthread_mutex_unlock(&philo->share->printf_mutex);
-}
-
-void counter(t_philo *philo)
-{
-	while (1)
-	{
-		printf("%ld\t =========> counter from p[%d] : %p : %d\n",
-			get_time() - philo->share->start_time,
-			philo->index, 
-			&(philo->share->share_dead),
-			philo->share->share_dead);
-	
-		if(philo->share->share_dead == 1)
-			return ;
-		pthread_mutex_lock(&philo->mutex);
-		if (!philo->is_eating && get_time() - philo->time_begin_count > philo->share->arg.die)
-		{
-			printf_mutex(philo, "die");
-			philo->share->share_dead = 1;
-			pthread_mutex_unlock(&philo->mutex);
-			pthread_mutex_unlock(&(philo->share->somebody_dead_mutex));
-			return ;
-		}
-		pthread_mutex_unlock(&philo->mutex);
-		usleep(1000);
-	}
 }
 
 void *share_counter(t_philo **philo)
@@ -181,6 +151,7 @@ void *share_counter(t_philo **philo)
 
 		while(i < philo[0]->share->arg.total)
 		{
+			// somebody dead
 			if ((int)(get_time() - philo[i]->time_begin_count) > philo[i]->share->arg.die)
 			{
 				philo[i]->share->share_dead = 1;
@@ -205,44 +176,22 @@ void *share_counter(t_philo **philo)
 			return (NULL);
 		}
 		ft_usleep(1);
-		//usleep(1000);
 	}
 	return (NULL);
 }
 
 void *activites(t_philo *philo)
 {
-	//philo->time_begin_count = get_time();
-	//philo->die_duration = philo->time_begin_count + philo->arg.die;
-	//pthread_t count_dead;
-	//pthread_create(&count_dead, NULL, (void* )&counter, philo);
-	//pthread_detach(count_dead);
-
 	while(1)
 	{
-/*		printf("%ld\t =========> counter from p[%d] : %p : %d\n",
-			get_time() - philo->share->start_time,
-			philo->index, 
-			&(philo->share->share_dead),
-			philo->share->share_dead);
-		if(philo->share->share_dead == 1)
-			return ;
-*/
-//	pthread_t count_dead;
-//	pthread_create(&count_dead, NULL, (void* )&counter, philo);
-//	pthread_detach(count_dead);
 		pthread_mutex_lock(philo->lfork);
 		printf_mutex(philo, "has taken a lfork");
 		pthread_mutex_lock(philo->rfork);
 		printf_mutex(philo, "has taken a rfork");
 		philo->time_begin_count = get_time();
-//	pthread_mutex_lock(&philo->mutex);
 		printf_mutex(philo, "is eating");
-		philo->is_eating = 1;
 		//usleep(philo->share->arg.eat * 1000);
 		ft_usleep(philo->share->arg.eat);
-		philo->is_eating = 0;
-//	pthread_mutex_unlock(&philo->mutex);
 		pthread_mutex_unlock(philo->lfork); 
 		pthread_mutex_unlock(philo->rfork);
 		philo->eat_count++;
@@ -261,7 +210,6 @@ void init_philo(t_philo **philo, t_share *share, pthread_mutex_t **fork, int i)
 		philo[i]->lfork = fork[i];
 		philo[i]->time_begin_count = share->start_time;
 		philo[i]->eat_count = 0;
-		pthread_mutex_init(&(philo[i]->mutex), NULL);
 		if(i == share->arg.total - 1)
 			philo[i]->rfork = fork[0];
 		else
@@ -270,6 +218,7 @@ void init_philo(t_philo **philo, t_share *share, pthread_mutex_t **fork, int i)
 	    pthread_create(&(philo[i]->thread), NULL, (void *)&activites, philo[i]);
 		pthread_detach(philo[i]->thread);
 }
+
 void init(t_philo **philo, t_share *share, t_arg arg, pthread_mutex_t **fork)
 {
 	int i;
@@ -307,7 +256,6 @@ void init(t_philo **philo, t_share *share, t_arg arg, pthread_mutex_t **fork)
 	pthread_detach(share->share_thread);
 }
 
-
 int main(int ac, char **av)
 {
 	t_arg 	arg;
@@ -323,29 +271,16 @@ int main(int ac, char **av)
 	t_share share;
 	
 	init(philo, &share, arg, fork);
-	int i = 0;
-/*
-	printf("before join\n");
-	while (i < arg.total){
-		printf("in while join\n");	
-		pthread_join(philo[i++]->thread, NULL);
-	}
-	printf("after join\n");
-*/
 
 	pthread_mutex_lock(&share.somebody_dead_mutex);
-//	pthread_mutex_unlock(&share.somebody_dead_mutex);
 	
-
-//	ft_usleep(arg.die);
 
 	pthread_mutex_destroy(&(share.printf_mutex));
 	pthread_mutex_destroy(&(share.somebody_dead_mutex));
-	i = 0;
+	int i = 0;
 	while (i < arg.total)	
 	{
 		pthread_mutex_destroy(fork[i]);
-		pthread_mutex_destroy(&(philo[i]->mutex));
 		free(philo[i]);
 		free(fork[i]);
 		i++;
