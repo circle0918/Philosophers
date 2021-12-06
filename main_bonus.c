@@ -146,24 +146,40 @@ void	printf_mutex(t_philo *philo, char* msg)
 	pthread_mutex_unlock(&philo->share->printf_mutex);
 }
 
-void   *printf_die_mutex(t_philo **philo, int i)
+int	printf_die_mutex(t_philo **philo, int i)
 {
 	philo[i]->share->share_dead = 1;
 	pthread_mutex_lock(&philo[0]->share->printf_mutex);
 	printf("%ld\tphilo %d die\n", get_time() - philo[i]->share->start_time, philo[i]->index);
 	pthread_mutex_unlock(&philo[0]->share->printf_mutex);
 	pthread_mutex_unlock(&(philo[0]->share->somebody_dead_mutex));
-	return (NULL);
+	return (1);
 }
 
-void	*printf_must_est_mutex(t_philo **philo)
+int	printf_must_est_mutex(t_philo **philo)
 {			
 	philo[0]->share->share_dead = 1;
 	pthread_mutex_lock(&philo[0]->share->printf_mutex);
 	printf("must eat done\n");
 	pthread_mutex_unlock(&philo[0]->share->printf_mutex);
 	pthread_mutex_unlock(&(philo[0]->share->somebody_dead_mutex));	
-	return (NULL);
+	return (1);
+}
+
+void exit_free(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
+{
+	pthread_mutex_destroy(&(share->printf_mutex));
+	pthread_mutex_destroy(&(share->somebody_dead_mutex));
+	int i = 0;
+	while (i < arg.total)	
+	{
+		kill(philo[i]->pid, SIGTERM);
+		free(philo[i]);
+		i++;
+	}
+	free(philo);
+	sem_close(forks);
+	sem_unlink("forks");
 }
 
 void *share_counter(t_philo **philo)
@@ -178,15 +194,20 @@ void *share_counter(t_philo **philo)
 		must_eat_done = 1;
 		while(i < philo[0]->share->arg.total)
 		{
-			if ((int)(get_time() - philo[i]->time_begin_count) > philo[i]->share->arg.die)
-				return (printf_die_mutex(philo, i));
+//			if ((int)(get_time() - philo[i]->time_begin_count) > philo[i]->share->arg.die)
+//				exit (printf_die_mutex(philo, i));
 
 			finish_must_eat = philo[i]->eat_count >= philo[i]->share->arg.must_eat;
+			printf("%d eaten. if finish_must_eat : %d\n", philo[i]->eat_count, finish_must_eat);
 			must_eat_done = must_eat_done && finish_must_eat; 
 			i++;
 		}
-		if (must_eat_done)
-			return (printf_must_est_mutex(philo));
+		if (must_eat_done) 
+		{
+			printf("in must_eat_done\n");
+			exit_free(philo, philo[0]->share, philo[0]->share->arg, philo[0]->forks);
+			exit(printf_must_est_mutex(philo));
+		}
 		ft_usleep(1);
 	}
 	return (NULL);
@@ -249,24 +270,11 @@ void init(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
 	pthread_mutex_init(&share->printf_mutex, NULL);
 
 	init_philo(philo, share, forks);
-	//pthread_create(&(share->share_thread), NULL, (void *)&share_counter, philo);
-	//pthread_detach(share->share_thread);
+	pthread_create(&(share->share_thread), NULL, (void *)&share_counter, philo);
+	pthread_detach(share->share_thread);
 }
 
-void exit_free(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
-{
-	pthread_mutex_destroy(&(share->printf_mutex));
-	pthread_mutex_destroy(&(share->somebody_dead_mutex));
-	int i = 0;
-	while (i < arg.total)	
-	{
-		free(philo[i]);
-		i++;
-	}
-	free(philo);
-	sem_close(forks);
-	sem_unlink("forks");
-}
+
 
 int main(int ac, char **av)
 {
@@ -283,7 +291,7 @@ int main(int ac, char **av)
 	if(!philo || !forks)
 		return (-1);
 	init(philo, &share, arg, forks);
-	pthread_mutex_lock(&share.somebody_dead_mutex);
+//	pthread_mutex_lock(&share.somebody_dead_mutex);
 	waitpid(-1, NULL, 0);
 	exit_free(philo, &share, arg, forks);
 	return (0);
