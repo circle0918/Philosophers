@@ -12,7 +12,9 @@
 
 #SRCS			= main.c utils.c exit.c messages.c init.c forks.c eat.c
 SRCS			= main.c
+SRCS_BONUS		= main_bonus.c
 OBJS			= $(SRCS:.c=.o)
+OBJS_BONUS		= $(SRCS_BONUS:.c=.o)
 
 CC				= gcc
 RM				= rm -f
@@ -21,17 +23,21 @@ CFLAGS			= -I.
 LIBS			= -lpthread
 
 NAME			= philo
+NAME_BONUS		= philo_bonus
 
 all:			$(NAME)
 
 $(NAME):		$(OBJS)
 				gcc ${CFLAGS} -o ${NAME} ${OBJS} ${LIBS}
 
+bonus:			$(OBJS_BONUS)
+				gcc ${CFLAGS} -o ${NAME_BONUS} ${OBJS_BONUS} ${LIBS}
+
 clean:
-				$(RM) $(OBJS) $(BONUS_OBJS)
+				$(RM) $(OBJS) $(OBJS_BONUS)
 
 fclean:			clean
-				$(RM) $(NAME)
+				$(RM) $(NAME) ${NAME_BONUS}
 
 re:				fclean $(NAME)
 
