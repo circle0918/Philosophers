@@ -23,18 +23,18 @@ int	ft_atoi(const char *str)
 	return ((int)ret);
 }
 
-int isnum(int ac, char **av)
+int	isnum(int ac, char **av)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 1;
 	j = 0;
-	while(i < ac)
+	while (i < ac)
 	{
-		while(av[i][j])
+		while (av[i][j])
 		{
-			if(!(av[i][j] >= '0' && av[i][j] <= '9'))
+			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
 				return (-1);
 			j++;
 		}
@@ -43,9 +43,9 @@ int isnum(int ac, char **av)
 	return (1);
 }
 
-int parser(int ac, char **av, t_arg *arg)
+int	parser(int ac, char **av, t_arg *arg)
 {
-	if((ac == 5 || ac == 6) && (isnum(ac, av)))
+	if ((ac == 5 || ac == 6) && (isnum(ac, av)))
 	{
 		arg->total = ft_atoi(av[1]);
 		arg->die = ft_atoi(av[2]);
@@ -55,7 +55,8 @@ int parser(int ac, char **av, t_arg *arg)
 			arg->must_eat = ft_atoi(av[5]);
 		else
 			arg->must_eat = 2147483647;
-		if(arg->total < 0|| arg->die < 0 || arg->eat < 0 || arg->sleep < 0 || arg->must_eat < 0)
+		if (arg->total < 0 || arg->die < 0 || arg->eat < 0
+			|| arg->sleep < 0 || arg->must_eat < 0)
 		{
 			printf("%s\n", "Error argument : wrong input");
 			return (1);
@@ -68,5 +69,3 @@ int parser(int ac, char **av, t_arg *arg)
 	}
 	return (0);
 }
-
-

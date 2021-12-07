@@ -1,13 +1,12 @@
 #include "philosophers.h"
 
-
 //mille second 
-unsigned long get_time()
+unsigned long	get_time(void)
 {
-	struct timeval t;
- 	
+	struct timeval	t;
+
 	gettimeofday(&t, NULL);
-    return (t.tv_sec * 1000 + t.tv_usec / 1000);
+	return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
 
 //input change to millisecond (usleep's input is mircosecond)
@@ -20,5 +19,3 @@ void	ft_usleep(unsigned long millisecond)
 	while (get_time() < end_time)
 		usleep(millisecond);
 }
-
-

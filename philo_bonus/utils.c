@@ -1,11 +1,11 @@
 #include "philosophers_bonus.h"
 
-unsigned long get_time()
+unsigned long	get_time(void)
 {
-	struct timeval t;
- 	
+	struct timeval	t;
+
 	gettimeofday(&t, NULL);
-    return (t.tv_sec * 1000 + t.tv_usec / 1000);
+	return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
 
 //input change to millisecond (usleep's input is mircosecond)
@@ -18,11 +18,13 @@ void	ft_usleep(unsigned long millisecond)
 	while (get_time() < end_time)
 		usleep(millisecond);
 }
-void	printf_mutex(t_philo *philo, char* msg)
+
+void	printf_mutex(t_philo *philo, char *msg)
 {
 	sem_wait(philo->share->print);
-	if(philo->share->share_dead == 0)
-		printf("%ld\tphilo %d %s\n", get_time() - philo->share->start_time, philo->index, msg);
+	if (philo->share->share_dead == 0)
+		printf("%ld\tphilo %d %s\n",
+			get_time() - philo->share->start_time, philo->index, msg);
 	sem_post(philo->share->print);
 }
 
@@ -41,6 +43,3 @@ int	printf_must_est_mutex(t_philo **philo)
 	printf("must eat done\n");
 	return (1);
 }
-
-
-
