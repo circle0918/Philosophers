@@ -61,8 +61,8 @@ void	*activites(t_philo *philo)
 	while (1)
 	{
 		sem_wait(philo->forks);
-		printf_mutex(philo, "has taken a lfork");
-		printf_mutex(philo, "has taken a rfork");
+		printf_mutex(philo, "has taken a fork");
+		printf_mutex(philo, "has taken a fork");
 		philo->time_begin_count = get_time();
 		printf_mutex(philo, "is eating");
 		ft_usleep(philo->share->arg.eat);

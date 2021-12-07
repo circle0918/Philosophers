@@ -31,9 +31,9 @@ void	*activites(t_philo *philo)
 	while (1)
 	{
 		pthread_mutex_lock(philo->lfork);
-		printf_mutex(philo, "has taken a lfork");
+		printf_mutex(philo, "has taken a fork");
 		pthread_mutex_lock(philo->rfork);
-		printf_mutex(philo, "has taken a rfork");
+		printf_mutex(philo, "has taken a fork");
 		philo->time_begin_count = get_time();
 		printf_mutex(philo, "is eating");
 		ft_usleep(philo->share->arg.eat);
