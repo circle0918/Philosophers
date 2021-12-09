@@ -32,10 +32,11 @@ int	isnum(int ac, char **av)
 	j = 0;
 	while (i < ac)
 	{
+		j = 0;
 		while (av[i][j])
 		{
 			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
-				return (-1);
+				return (0);
 			j++;
 		}
 		i++;
@@ -58,13 +59,13 @@ int	parser(int ac, char **av, t_arg *arg)
 		if (arg->total < 0 || arg->die < 0 || arg->eat < 0
 			|| arg->sleep < 0 || arg->must_eat < 0)
 		{
-			printf("%s\n", "Error argument : wrong input");
+			printf("%s\n", "1Error argument : wrong input");
 			return (1);
 		}
 	}
 	else
 	{	
-		printf("%s\n", "Error argument : wrong input");
+		printf("%s\n", "2Error argument : wrong input");
 		return (1);
 	}
 	return (0);
