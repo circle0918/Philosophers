@@ -32,10 +32,11 @@ int	isnum(int ac, char **av)
 	j = 0;
 	while (i < ac)
 	{
+		j = 0;
 		while (av[i][j])
 		{
 			if (!(av[i][j] >= '0' && av[i][j] <= '9'))
-				return (-1);
+				return (0);
 			j++;
 		}
 		i++;
