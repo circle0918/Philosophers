@@ -6,7 +6,7 @@
 #    By: yyuan <yyuan@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/09 19:06:43 by yyuan             #+#    #+#              #
-#    Updated: 2021/12/11 22:06:52 by yyuan            ###   ########.fr        #
+#    Updated: 2021/12/11 22:43:14 by yyuan            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,35 +14,35 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
 NAME= philo
-NAME_BONUS= bonus_
+NAME_BONUS= philo_bonus
 SOURCES = ./main.c \
 			./parser.c ./print.c ./utils.c
-SRCS_BONUS = ./philo_bonus/main_bonus.c \
-					./philo_bonus/parser_bonus.c ./philo_bonus/init_bonus.c ./philo_bonus/utils_bonus.c
+SRCS_BONUS = ./bonus/main_bonus.c \
+					./bonus/parser_bonus.c ./bonus/init_bonus.c ./bonus/utils_bonus.c
 
 OBJS = $(SOURCES:.c=.o)
-OBJS_BONUS = $(SRCS_BONUS:./philo_bonus/%.c=./philo_bonus/%.o)
+OBJS_BONUS = $(SRCS_BONUS:./bonus/%.c=./bonus/%.o)
 
 DEPS = -I.
-DEPS_BONUS = -I./philo_bonus
+DEPS_BONUS = -I./bonus
 
 RM	= rm -rf
 
 all: $(NAME)
 
 $(NAME):$(OBJS) 
-	gcc $(CFLAGS) -o $(NAME) $(OBJS) $(DEPS) -lpthread
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(DEPS) -lpthread
+
+$(OBJS):%.o:%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled "$<" successfully!"
 
 bonus: $(NAME_BONUS)
 
 $(NAME_BONUS): $(OBJS_BONUS)
-	@gcc $(CFLAGS) -o $(NAME_BONUS) $(OBJS_BONUS) $(DEPS_BONUS) -lpthread
+	$(CC) $(CFLAGS) -o $(NAME_BONUS) $(OBJS_BONUS) $(DEPS_BONUS) -lpthread
 
-$(OBJS_BONUS): ./philo_bonus/%.o : ./philo_bonus/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-	@echo "Compiled "$<" successfully!"
-
-$(OBJS):%.o:%.c
+$(OBJS_BONUS): ./bonus/%.o : ./bonus/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully!"
 
