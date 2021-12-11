@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers_bonus.h                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yyuan <marvin@42.fr>                       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/11 14:28:33 by yyuan             #+#    #+#             */
+/*   Updated: 2021/12/11 17:06:02 by yyuan            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_BONUS_H
 # define PHILOSOPHERS_BONUS_H
 
@@ -9,6 +21,7 @@
 # include <semaphore.h>
 # include <fcntl.h>
 # include <sys/wait.h>
+#include <signal.h>
 
 typedef struct s_arg
 {
