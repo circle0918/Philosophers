@@ -6,10 +6,10 @@
 #    By: yyuan <yyuan@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/12/09 19:06:43 by yyuan             #+#    #+#              #
-#    Updated: 2021/12/12 11:20:30 by yyuan            ###   ########.fr        #
+#    Updated: 2021/12/12 11:15:38 by yyuan            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-NAME     = philo
+NAME     = philo_bonus
 
 CC       = gcc
 # compiling flags here
@@ -57,13 +57,4 @@ fclean: clean
 
 re: fclean all
 
-bonus:
-	+$(MAKE) -C philo_bonus
-
-bonus_clean:
-	+$(MAKE) clean -C philo_bonus
-
-bonus_fclean:
-	+$(MAKE) fclean -C philo_bonus
-
-.PHONY: all clean fclean re bonus 
+.PHONY: all clean fclean re 
