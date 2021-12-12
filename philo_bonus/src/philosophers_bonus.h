@@ -21,7 +21,7 @@
 # include <semaphore.h>
 # include <fcntl.h>
 # include <sys/wait.h>
-#include <signal.h>
+# include <signal.h>
 
 typedef struct s_arg
 {
