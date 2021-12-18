@@ -33,7 +33,7 @@ void	ft_usleep(unsigned long millisecond)
 
 void	printf_mutex(t_philo *philo, char *msg)
 {
-	int is_dead;
+	int	is_dead;
 
 	sem_wait(philo->share->print);
 	sem_wait(philo->share->update_dead);

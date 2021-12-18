@@ -23,14 +23,12 @@ void	printf_mutex(t_philo *philo, char *msg)
 
 void	*printf_die_mutex(t_philo **philo, int i)
 {
-	int j;
+	int	j;
 
 	pthread_mutex_lock(&(philo[0]->share->printf_mutex));
-	
 	pthread_mutex_lock(&philo[0]->share->somebody_dead_mutex);
 	philo[i]->share->share_dead = 1;
 	pthread_mutex_unlock(&philo[0]->share->somebody_dead_mutex);
-	
 	printf("%ld\tphilo %d die\n",
 		get_time() - philo[i]->share->start_time, philo[i]->index);
 	pthread_mutex_unlock(&(philo[0]->share->printf_mutex));
@@ -47,14 +45,12 @@ void	*printf_die_mutex(t_philo **philo, int i)
 
 void	*printf_must_est_mutex(t_philo **philo)
 {	
-	int j;
-		
+	int	j;
+
 	pthread_mutex_lock(&philo[0]->share->printf_mutex);
-	
 	pthread_mutex_lock(&philo[0]->share->somebody_dead_mutex);
 	philo[0]->share->share_dead = 1;
 	pthread_mutex_unlock(&philo[0]->share->somebody_dead_mutex);
-	
 	printf("must eat done\n");
 	pthread_mutex_unlock(&philo[0]->share->printf_mutex);
 	j = -1;
@@ -62,7 +58,6 @@ void	*printf_must_est_mutex(t_philo **philo)
 	{
 		pthread_join(philo[j]->thread, NULL);
 	}
-	//pthread_mutex_unlock(&philo[i]->finish_mutex);
 	return (NULL);
 }
 

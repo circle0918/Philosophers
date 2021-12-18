@@ -20,27 +20,18 @@ void	*share_counter(t_philo **philo)
 
 	while (1)
 	{
-		i = 0;
+		i = -1;
 		must_eat_done = 1;
-		while (i < philo[0]->share->arg.total)
+		while (++i < philo[0]->share->arg.total)
 		{
-//printf("in while philo!\n");
 			pthread_mutex_lock(&philo[i]->finish_mutex);
-//			if (!(philo[i]->share->share_philos_finish[i]))
-//			{
-//printf("in philo %d not dead!\n", i);
-			pthread_mutex_lock(&philo[0]->share->update_tbc);
-			int is_dead = (int)(get_time() - philo[i]->time_begin_count) > philo[i]->share->arg.die;
-			pthread_mutex_unlock(&philo[0]->share->update_tbc);
-			if (is_dead)
+			if (is_dead(philo, i))
 				return (printf_die_mutex(philo, i));
 			pthread_mutex_lock(&(philo[0]->share->update_ec));
 			is_finish = philo[i]->eat_count >= philo[i]->share->arg.must_eat;
 			pthread_mutex_unlock(&(philo[0]->share->update_ec));
 			must_eat_done = (must_eat_done && is_finish);
-//			}
 			pthread_mutex_unlock(&philo[i]->finish_mutex);
-			i++;
 		}
 		if (must_eat_done)
 			return (printf_must_est_mutex(philo));
@@ -48,31 +39,13 @@ void	*share_counter(t_philo **philo)
 	}
 	return (NULL);
 }
-int	somebody_dead(t_philo *philo)
-{
-	int	ret;
 
-	pthread_mutex_lock(&(philo->share->somebody_dead_mutex));
-	ret = philo->share->share_dead;
-	pthread_mutex_unlock(&(philo->share->somebody_dead_mutex));
-	return (ret);
-}
 void	*activites(t_philo *philo)
 {
 	while (!(somebody_dead(philo))
 		&& philo->eat_count < philo->share->arg.must_eat)
 	{
-		pthread_mutex_lock(philo->lfork);
-		printf_mutex(philo, "has taken a fork");
-		if (philo->share->arg.total == 1)
-		{
-			ft_usleep(philo->share->arg.die+200);
-		}
-		else
-		{
-			pthread_mutex_lock(philo->rfork);
-			printf_mutex(philo, "has taken a fork");
-		}
+		take_forks(philo);
 		pthread_mutex_lock(&philo->share->update_tbc);
 		philo->time_begin_count = get_time();
 		pthread_mutex_unlock(&philo->share->update_tbc);
@@ -89,9 +62,6 @@ void	*activites(t_philo *philo)
 		printf_mutex(philo, "is thinking");
 		usleep(150);
 	}
-	//pthread_mutex_lock(&philo->finish_mutex);
-	//philo->share->share_philos_finish[philo->index] = 1;
-	//pthread_mutex_unlock(&philo->finish_mutex);
 	return (NULL);
 }
 
@@ -128,7 +98,6 @@ void	init(t_philo **philo, t_share *share, t_arg arg, pthread_mutex_t **fork)
 	share->share_dead = 0;
 	share->start_time = get_time();
 	pthread_mutex_init(&(share->somebody_dead_mutex), NULL);
-	//pthread_mutex_lock(&(share->somebody_dead_mutex));
 	pthread_mutex_init(&share->printf_mutex, NULL);
 	pthread_mutex_init(&share->update_tbc, NULL);
 	pthread_mutex_init(&share->update_ec, NULL);
@@ -162,7 +131,6 @@ int	main(int ac, char **av)
 	if (!philo || !fork)
 		return (-1);
 	init(philo, &share, arg, fork);
-	//pthread_mutex_lock(&share.somebody_dead_mutex);
 	exit_free(philo, &share, arg, fork);
 	return (0);
 }

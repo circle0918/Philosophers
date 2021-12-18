@@ -37,12 +37,13 @@ void	exit_free(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
 
 void	*counter(t_philo *philo)
 {
-	int is_dead;
+	int	is_dead;
 
 	while (1)
 	{
 		sem_wait(philo->share->update_tbc);
-		is_dead = (int)(get_time() - philo->time_begin_count) > philo->share->arg.die;
+		is_dead = (int)(get_time() - philo->time_begin_count)
+			> philo->share->arg.die;
 		sem_post(philo->share->update_tbc);
 		if (is_dead)
 			exit(printf_die_mutex(philo, philo->index));

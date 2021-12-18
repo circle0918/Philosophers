@@ -38,7 +38,7 @@ typedef struct s_share
 	pthread_mutex_t		somebody_dead_mutex;
 	pthread_t			share_thread;
 	int					share_dead;
-	char					*share_philos_finish;
+	char				*share_philos_finish;
 }	t_share;
 
 typedef struct s_philo
@@ -70,5 +70,7 @@ void			init(t_philo **philo, t_share *share,
 					t_arg arg, pthread_mutex_t **fork);
 void			exit_free(t_philo **philo, t_share *share,
 					t_arg arg, pthread_mutex_t **fork);
-
+int				somebody_dead(t_philo *philo);
+int				is_dead(t_philo **philo, int i);
+void			take_forks(t_philo *philo);
 #endif
