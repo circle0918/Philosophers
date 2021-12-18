@@ -26,16 +26,25 @@ void	exit_free(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
 	sem_close(forks);
 	sem_close(share->must_eat_done);
 	sem_close(share->print);
+	sem_close(share->update_tbc);
+	sem_close(share->update_dead);
 	sem_unlink("forks");
 	sem_unlink("must_eat_done");
 	sem_unlink("print");
+	sem_unlink("update_tbc");
+	sem_unlink("update_dead");
 }
 
 void	*counter(t_philo *philo)
 {
+	int is_dead;
+
 	while (1)
 	{
-		if ((int)(get_time() - philo->time_begin_count) > philo->share->arg.die)
+		sem_wait(philo->share->update_tbc);
+		is_dead = (int)(get_time() - philo->time_begin_count) > philo->share->arg.die;
+		sem_post(philo->share->update_tbc);
+		if (is_dead)
 			exit(printf_die_mutex(philo, philo->index));
 		ft_usleep(1);
 	}
@@ -63,7 +72,9 @@ void	*activites(t_philo *philo)
 		sem_wait(philo->forks);
 		printf_mutex(philo, "has taken a fork");
 		printf_mutex(philo, "has taken a fork");
+		sem_wait(philo->share->update_tbc);
 		philo->time_begin_count = get_time();
+		sem_post(philo->share->update_tbc);
 		printf_mutex(philo, "is eating");
 		ft_usleep(philo->share->arg.eat);
 		sem_post(philo->forks);

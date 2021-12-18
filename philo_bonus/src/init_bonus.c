@@ -44,6 +44,10 @@ void	init(t_philo **philo, t_share *share, t_arg arg, sem_t *forks)
 	share->start_time = get_time();
 	sem_unlink("print");
 	share->print = sem_open("print", O_CREAT, S_IRWXU, 1);
+	sem_unlink("update_tbc");
+	share->update_tbc = sem_open("update_tbc", O_CREAT, S_IRWXU, 1);
+	sem_unlink("update_dead");
+	share->update_dead = sem_open("update_dead", O_CREAT, S_IRWXU, 1);
 	sem_unlink("must_eat_done");
 	share->must_eat_done = sem_open("must_eat_done", O_CREAT, S_IRWXU, 0);
 	init_philo(philo, share, forks);

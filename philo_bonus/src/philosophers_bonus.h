@@ -37,6 +37,8 @@ typedef struct s_share
 	t_arg				arg;
 	unsigned long		start_time;
 	sem_t				*print;
+	sem_t				*update_tbc;
+	sem_t				*update_dead;
 	sem_t				*must_eat_done;
 	pthread_t			share_thread;
 	int					share_dead;

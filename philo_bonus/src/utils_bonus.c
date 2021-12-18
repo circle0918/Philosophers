@@ -33,8 +33,13 @@ void	ft_usleep(unsigned long millisecond)
 
 void	printf_mutex(t_philo *philo, char *msg)
 {
+	int is_dead;
+
 	sem_wait(philo->share->print);
-	if (philo->share->share_dead == 0)
+	sem_wait(philo->share->update_dead);
+	is_dead = philo->share->share_dead;
+	sem_post(philo->share->update_dead);
+	if (is_dead == 0)
 		printf("%ld\tphilo %d %s\n",
 			get_time() - philo->share->start_time, philo->index, msg);
 	sem_post(philo->share->print);
@@ -42,7 +47,9 @@ void	printf_mutex(t_philo *philo, char *msg)
 
 int	printf_die_mutex(t_philo *philo, int i)
 {
+	sem_wait(philo->share->update_dead);
 	philo->share->share_dead = 1;
+	sem_post(philo->share->update_dead);
 	sem_wait(philo->share->print);
 	printf("%ld\tphilo %d die\n", get_time() - philo->share->start_time, i);
 	return (1);
@@ -50,7 +57,9 @@ int	printf_die_mutex(t_philo *philo, int i)
 
 int	printf_must_est_mutex(t_philo **philo)
 {			
+	sem_wait(philo[0]->share->update_dead);
 	philo[0]->share->share_dead = 1;
+	sem_post(philo[0]->share->update_dead);
 	sem_wait(philo[0]->share->print);
 	printf("must eat done\n");
 	return (1);
