@@ -13,11 +13,13 @@ NAME     = philo_bonus
 
 CC       = gcc
 # compiling flags here
-CFLAGS   = -Wall -Wextra -Werror -I.
+#CFLAGS   = -Wall -Wextra -Werror -I.
+CFLAGS   = -Wall -Wextra -Werror -I. -fsanitize=thread -g
 
 LINKER   = gcc
 # linking flags here
-LFLAGS   = -Wall -Wextra -Werror -I. -lpthread
+#LFLAGS   = -Wall -Wextra -Werror -I. -lpthread
+LFLAGS   = -Wall -Wextra -Werror -I. -lpthread -fsanitize=thread -g
 
 # change these to proper directories where each file should be
 SRCDIR   = src

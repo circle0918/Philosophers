@@ -17,6 +17,7 @@
 # include <unistd.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <string.h>
 
 typedef struct s_arg
 {
@@ -32,9 +33,12 @@ typedef struct s_share
 	t_arg				arg;
 	unsigned long		start_time;
 	pthread_mutex_t		printf_mutex;
+	pthread_mutex_t		update_tbc;
+	pthread_mutex_t		update_ec;
 	pthread_mutex_t		somebody_dead_mutex;
 	pthread_t			share_thread;
 	int					share_dead;
+	char					*share_philos_finish;
 }	t_share;
 
 typedef struct s_philo
@@ -46,6 +50,7 @@ typedef struct s_philo
 	pthread_t		thread;
 	pthread_mutex_t	*lfork;
 	pthread_mutex_t	*rfork;
+	pthread_mutex_t	finish_mutex;
 	t_share			*share;
 }	t_philo;
 
