@@ -12,5 +12,7 @@ pthread_mutex_lock,
 pthread_mutex_unlock
 
 check data race :
+main branch data race
+branch 42 est bon
 valgrind --tool=helgrind
 gcc -Wall -Wextra -Werror -I. -fsanitize=thread -g
