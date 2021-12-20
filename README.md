@@ -10,3 +10,7 @@ pthread_mutex_init lock
 pthread_mutex_destroy 
 pthread_mutex_lock,
 pthread_mutex_unlock
+
+check data race :
+valgrind --tool=helgrind
+gcc -Wall -Wextra -Werror -I. -fsanitize=thread -g
